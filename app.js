@@ -6,10 +6,9 @@ window.onload = function(){
 	for(let i = 0; i<9; i++){
 		let square = document.createElement('div');
 		square.className = 'square';
-		square.id = 'square';
 		board.appendChild(square);
 	}
-	let squares = document.querySelectorAll('#board #square');
+	let squares = document.querySelectorAll('#board .square');
 	console.log(squares);
 	let restart = document.createElement('button');
 	restart.innerHTML 	= 'restart';
@@ -31,6 +30,21 @@ window.onload = function(){
 		rowsLeft.innerHTML = '';
 		rowsRight.innerHTML = '';
 	}
+	function checkForTheWinner(){
+		let sqrs = Array.prototype.slice.call(squares, 0);
+		let winningCombos = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 4, 8], [2, 4, 6]];
+		let symbols = sqrs.map(function(square){
+			return square.innerHTML;
+		});
+		return winningCombos.find(function(combo){
+			if(symbols[combo[0]] === symbols[combo[1]] && symbols[combo[1]] === symbols[combo[2]]){
+				return symbols[combo[0]];
+			} else {
+				return false;
+			}
+		});
+		console.log(symbols);
+	}
 	board.addEventListener('click', function(e){
 		counter++;
 		if(String(e.target.innerHTML).length!==0){
@@ -44,18 +58,13 @@ window.onload = function(){
 		e.target.innerHTML = currentPlayer;
 		e.target.style.background = currentColor;
 		currentColor = currentColor === xColor ? yColor : xColor;
-		currentPlayer = currentPlayer === playerXSign ? playerYSign : playerXSign;
-		for(let i = 0; i<childs.length; i++){
-			if(childs[i].innerHTML === 'X' && childs[i+1].innerHTML === 'X' && childs[i-1].innerHTML === 'X'){
-				modal.innerHTML = '';
-				modal.innerHTML = 'You are the winner ' + playerXSign + ' player';
-				modal.classList.toggle('visible');
-				setTimeout(function(){
-					modal.classList.toggle('visible');
-				}, 5000);
-				return;
-			}
+		if(checkForTheWinner()){
+			console.log(currentPlayer);
+			modal.classList.toggle('visible');
+			modal.innerHTML = '';
+			modal.innerHTML = 'The winner is ' + currentPlayer;
 		}
+		currentPlayer = currentPlayer === playerXSign ? playerYSign : playerXSign;
 	});
 	restart.addEventListener('click', function(e){
 		for(let i = 0; i<squares.length; i++){
@@ -64,5 +73,6 @@ window.onload = function(){
 		}
 		clearRows();
 		modal.classList.toggle('visible');
+		currentPlayer = playerXSign;
 	});
 };
